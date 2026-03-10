@@ -1,0 +1,87 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  linux_build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust with musl target
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-unknown-linux-musl
+
+    - name: Build with musl
+      run: cargo build --release --target x86_64-unknown-linux-musl
+
+    - shell: bash
+      run: |
+        mkdir -p dist
+        cp target/x86_64-unknown-linux-musl/release/hgignore-to-gitignore dist/hgignore-to-gitignore
+        chmod +x dist/hgignore-to-gitignore
+        cd dist
+        tar czf ../hgignore-to-gitignore_linux_x86_64.tar.gz hgignore-to-gitignore
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: hgignore-to-gitignore_linux_x86_64.tar.gz
+
+  macos_build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-apple-darwin
+
+    - name: Build
+      run: cargo build --release --target x86_64-apple-darwin
+
+    - shell: bash
+      run: |
+        mkdir -p dist
+        cp target/x86_64-apple-darwin/release/hgignore-to-gitignore dist/hgignore-to-gitignore
+        chmod +x dist/hgignore-to-gitignore
+        cd dist
+        tar czf ../hgignore-to-gitignore_darwin_x86_64.tar.gz hgignore-to-gitignore
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: hgignore-to-gitignore_darwin_x86_64.tar.gz
+
+  windows_build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-pc-windows-msvc
+
+    - name: Build
+      run: cargo build --release --target x86_64-pc-windows-msvc
+
+    - shell: bash
+      run: |
+        mkdir -p dist
+        cp target/x86_64-pc-windows-msvc/release/hgignore-to-gitignore.exe dist/hgignore-to-gitignore.exe
+        cd dist
+        7z a ../hgignore-to-gitignore_windows_x86_64.zip hgignore-to-gitignore.exe
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: hgignore-to-gitignore_windows_x86_64.zip
