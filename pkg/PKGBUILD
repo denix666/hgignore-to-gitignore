@@ -1,0 +1,15 @@
+pkgname=hgignore-to-gitignore
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Convert .hgignore files to .gitignore format"
+arch=('x86_64')
+url='https://github.com/denix666/hgignore-to-gitignore'
+license=('MIT')
+
+source=('hgignore-to-gitignore')
+
+package() {
+    cd ${srcdir}
+    install -D -m755 hgignore-to-gitignore ${pkgdir}/usr/bin/hgignore-to-gitignore
+}
+sha256sums=('e53c66fba2704453cc66be8f8267a433186cfcdb550fa69560412e20c8cdc031')
